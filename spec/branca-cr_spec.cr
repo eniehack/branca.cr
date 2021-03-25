@@ -33,9 +33,9 @@ macro decoding_failure_test(no, exception)
   it "vector_test.json - decoding test No.{{no}}" do
     data = json["testGroups"][1]["tests"][{{no - 8}}]
 
-    config = Branca::Configuration.new key: data["key"].as_s.to_slice
-    branca = Branca::Token.new
     expect_raises({{exception}}) do
+      config = Branca::Configuration.new key: data["key"].as_s.to_slice
+      branca = Branca::Token.new
       branca.decode data["token"].as_s, config
     end
   end

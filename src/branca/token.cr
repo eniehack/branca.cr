@@ -8,11 +8,11 @@ module Branca
   BRANCA_VERSION = 0xBA.to_u8
   class Token
     property timestamp : UInt64
-    property ttl : UInt64
+    property ttl : UInt64?
 
     def initialize()
       @timestamp = 0
-      @ttl = 0
+      @ttl = nil
     end
 
     def encode(payload : Bytes, config : BaseConfiguration) : String
@@ -63,7 +63,7 @@ module Branca
       end
 
       unless @ttl.nil?
-        exp_time = @timestamp + @ttl
+        exp_time = @timestamp + @ttl.not_nil!
         now = Time.utc.to_unix
         if exp_time < now
           raise Branca::Error::TokenHasExpired.new
@@ -78,9 +78,9 @@ module Branca
       io = IO::Memory.new
 
       while int > 0
-        ord = UInt8.new(int.as(BigInt) & 0xFF)
+        ord = (int & 0xFF).to_u8
         buffer << ord
-        int = ((int - ord) / 256).to_big_i
+        int = (int - ord) // 256
       end
       buffer.reverse.each { |b| io.write_byte b }
       io.to_slice
