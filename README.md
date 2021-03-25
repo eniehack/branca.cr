@@ -1,5 +1,8 @@
 # branca-cr
 
+[![Docs status](https://img.shields.io/badge/docs-available-brightgreen.svg?style=flat-square)](https://eniehack.gitlab.io/branca.cr/)
+![Gitlab pipeline status](https://img.shields.io/gitlab/pipeline/eniehack/branca.cr/master?style=flat-square)
+
 [branca](https://github.com/tuupola/branca-spec) implemention for crystal-lang(https://crystal-lang.org).
 
 ## Installation
