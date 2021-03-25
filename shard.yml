@@ -1,4 +1,4 @@
-name: branca-cr
+name: branca
 version: 0.1.0
 
 authors:
@@ -8,7 +8,7 @@ dependencies:
   base62:
     github: Sija/base62.cr
   sodium:
-      github: didactic-drunk/sodium.cr
+    github: didactic-drunk/sodium.cr
 
 crystal: 0.36.1
 
