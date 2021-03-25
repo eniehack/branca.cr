@@ -17,12 +17,6 @@ module Branca
 
     def encode(payload : Bytes, config : BaseConfiguration) : String
       #TODO: payloadにJSONも受け付けられるようにする
-      #unless config.key.nil?
-      #  box = Sodium::Cipher::Aead::XChaCha20Poly1305Ietf.new config.key
-      #else
-      #  box = Sodium::Cipher::Aead::XChaCha20Poly1305Ietf.new
-      #end
-
       if @timestamp.nil?
         @timestamp = Time.utc.to_unix.to_u64
       end
@@ -51,16 +45,12 @@ module Branca
       end
 
       header = byte_token[0..28]
-      p "header: #{header}"
       encrypted = byte_token[29..]
-      p "encrypted: #{encrypted}"
 
       version = header[0]
       timestamp = header[1...5]
       @timestamp = IO::ByteFormat::BigEndian.decode(UInt32, timestamp).to_u64
-      p "timestamp(#{timestamp.bytesize}) : #{timestamp}"
       nonce = Sodium::Nonce.new header[5..28]
-      p "nonce: #{header[5..28]}"
 
       if version != BRANCA_VERSION
         raise Branca::Error::InvaildVersion.new
@@ -71,8 +61,6 @@ module Branca
       rescue Sodium::Error::DecryptionFailed
         raise Branca::Error::InvaildToken.new
       end
-
-      p payload
 
       unless @ttl.nil?
         exp_time = @timestamp + @ttl
