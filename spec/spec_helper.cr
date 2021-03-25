@@ -1,7 +1,7 @@
 require "spec"
 require "json"
 require "file"
-require "../src/branca-cr"
+require "../src/branca"
 
 class TestConfiguration < Branca::Configuration
   getter nonce : Sodium::Nonce
