@@ -6,17 +6,18 @@ require "./error"
 
 module Branca
   BRANCA_VERSION = 0xBA.to_u8
+
   class Token
     property timestamp : UInt64
     property ttl : UInt64?
 
-    def initialize()
+    def initialize
       @timestamp = 0
       @ttl = nil
     end
 
     def encode(payload : Bytes, config : BaseConfiguration) : String
-      #TODO: payloadにJSONも受け付けられるようにする
+      # TODO: payloadにJSONも受け付けられるようにする
       if @timestamp.nil?
         @timestamp = Time.utc.to_unix.to_u64
       end

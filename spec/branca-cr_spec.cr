@@ -1,6 +1,5 @@
 require "./spec_helper"
 
-
 macro encoding_test(no, payload)
   it "vector_test.json - encoding test No.{{no}}" do
     data = json["testGroups"][0]["tests"][{{no}}]
