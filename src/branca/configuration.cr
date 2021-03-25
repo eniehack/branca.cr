@@ -21,8 +21,10 @@ module Branca
       @nonce = Sodium::Nonce.random
     end
 
-    def self.new
-      new Sodium::SecureBuffer.random(32).to_slice
+    def initialize
+      @key = Sodium::SecureBuffer.random(32)
+      @box = Sodium::Cipher::Aead::XChaCha20Poly1305Ietf.new @key
+      @nonce = Sodium::Nonce.random
     end
   end
 end
