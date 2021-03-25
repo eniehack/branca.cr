@@ -40,6 +40,15 @@ token = branca.decode "870S4BYxgHw0KnP3W9fgVUHEhT5g86vJ17etaC5Kh5uIraWHCI1psNQGv
 
 TODO: Write development instructions here
 
+## License
+
+copyright (c) 2021 eniehack
+
+This software is licensed under [Apache License 2.0](https://apache.org/licenses/LICENSE-2.0.txt).
+
+but, `./spec/test_vectors.json`is provided from https://github.com/tuupola/branca-spec/blob/527997e1c954d450a503b12099652bbdf7fdb168/test_vectors.json , licensed by MIT/X11 License.
+so, this file is owned copyright by [tuupola](https://github.com/tuupola).
+
 ## Contributing
 
 1. Fork it (<https://gitlab.com/eniehack/branca-cr/fork>)
