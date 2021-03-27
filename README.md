@@ -12,7 +12,7 @@
    ```yaml
    dependencies:
      branca:
-       gitlab: eniehack/branca-cr
+       gitlab: eniehack/branca.cr
    ```
 
 2. Run `shards install`
