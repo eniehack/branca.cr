@@ -17,9 +17,9 @@ module Branca
       unless key.bytesize == 32
         raise Branca::Error::InvaildKeySize.new
       else
-        @key = Sodium::SecureBuffer.new key
+        buf_key = Sodium::SecureBuffer.new key
       end
-      @box = Sodium::Cipher::Aead::XChaCha20Poly1305Ietf.new @key
+      @box = Sodium::Cipher::Aead::XChaCha20Poly1305Ietf.new buf_key
       @nonce = Sodium::Nonce.random
     end
 

@@ -8,11 +8,9 @@ module Branca
   BRANCA_VERSION = 0xBA.to_u8
 
   class Token
-    property timestamp : UInt64
+    @config : BaseConfiguration
 
-    def initialize
-      @timestamp = 0
-    end
+    def initialize(@config : BaseConfiguration); end
 
     # encodes payloads from config
     #
@@ -24,12 +22,12 @@ module Branca
     # require "branca"
     #
     # config = Branca::Configuraion.new
-    # branca = Branca::Token.new
-    # token = branca.encode("hello world".to_slice, config)
+    # branca = Branca::Token.new(config)
+    # token = branca.encode("hello world".to_slice)
     # ```
-    def encode(payload : Bytes, config : BaseConfiguration) : String
-      if @timestamp.nil?
-        @timestamp = Time.utc.to_unix.to_u64
+    def encode(payload : Bytes, timestamp : UInt64?) : String
+      if timestamp.nil?
+        timestamp = Time.utc.to_unix.to_u64
       end
       byte_timestamp = uninitialized UInt8[4]
       IO::ByteFormat::BigEndian.encode @timestamp.to_u32, byte_timestamp.to_slice
@@ -56,10 +54,10 @@ module Branca
     # require "branca"
     #
     # config = Branca::Configuraion.new
-    # branca = Branca::Token.new
-    # token = branca.decode("870S4BYxgHw0KnP3W9fgVUHEhT5g86vJ17etaC5Kh5uIraWHCI1psNQGv298ZmjPwoYbjDQ9chy2z", config)
+    # branca = Branca::Token.new(config)
+    # token = branca.decode("870S4BYxgHw0KnP3W9fgVUHEhT5g86vJ17etaC5Kh5uIraWHCI1psNQGv298ZmjPwoYbjDQ9chy2z")
     # ```
-    def decode(token : String, config : BaseConfiguration) : Bytes
+    def decode(token : String) : Bytes
       begin
         byte_token = bigint_to_bytes Base62.decode(token)
       rescue
@@ -70,8 +68,7 @@ module Branca
       encrypted = byte_token[29..]
 
       version = header[0]
-      timestamp = header[1...5]
-      @timestamp = IO::ByteFormat::BigEndian.decode(UInt32, timestamp).to_u64
+      timestamp = IO::ByteFormat::BigEndian.decode(UInt32, header[1...5]).to_u64
       nonce = Sodium::Nonce.new header[5..28]
 
       if version != BRANCA_VERSION
