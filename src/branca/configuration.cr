@@ -10,9 +10,10 @@ module Branca
   class Configuration < BaseConfiguration
     getter nonce : Sodium::Nonce
     getter box : Sodium::Cipher::Aead::XChaCha20Poly1305Ietf
+    getter ttl : UInt64?
 
     # Creates a nonce,.and  generates from argument.
-    def initialize(key : Bytes)
+    def initialize(key : Bytes, ttl : UInt64?)
       unless key.bytesize == 32
         raise Branca::Error::InvaildKeySize.new
       else
@@ -23,9 +24,9 @@ module Branca
     end
 
     # Creates a secret key, and nonca.
-    def initialize
-      @key = Sodium::SecureBuffer.random(32)
-      @box = Sodium::Cipher::Aead::XChaCha20Poly1305Ietf.new @key
+    def initialize(@ttl : UInt64?)
+      key = Sodium::SecureBuffer.random(32)
+      @box = Sodium::Cipher::Aead::XChaCha20Poly1305Ietf.new(key)
       @nonce = Sodium::Nonce.random
     end
   end

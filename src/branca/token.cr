@@ -9,11 +9,9 @@ module Branca
 
   class Token
     property timestamp : UInt64
-    property ttl : UInt64?
 
     def initialize
       @timestamp = 0
-      @ttl = nil
     end
 
     # encodes payloads from config
@@ -86,8 +84,8 @@ module Branca
         raise Branca::Error::InvaildToken.new
       end
 
-      unless @ttl.nil?
-        exp_time = @timestamp + @ttl.not_nil!
+      unless @config.ttl.nil?
+        exp_time = @timestamp + @config.ttl.not_nil!
         now = Time.utc.to_unix
         if exp_time < now
           raise Branca::Error::TokenHasExpired.new
