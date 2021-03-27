@@ -23,7 +23,6 @@ macro decoding_success_test(no, body)
     config = Branca::Configuration.new key: data["key"].as_s.to_slice, ttl: nil
     branca = Branca::Token.new config
     branca.decode(data["token"].as_s).should eq({{body}})
-    branca.timestamp.should eq data["timestamp"].as_i64.to_u64
   end
 end
 

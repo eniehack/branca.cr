@@ -30,7 +30,7 @@ module Branca
         timestamp = Time.utc.to_unix.to_u64
       end
       byte_timestamp = uninitialized UInt8[4]
-      IO::ByteFormat::BigEndian.encode @timestamp.to_u32, byte_timestamp.to_slice
+      IO::ByteFormat::BigEndian.encode timestamp.to_u32, byte_timestamp.to_slice
 
       header = IO::Memory.new
       token = IO::Memory.new
@@ -38,9 +38,9 @@ module Branca
 
       writer.write_byte BRANCA_VERSION
       byte_timestamp.to_slice.each { |b| writer.write_byte b }
-      config.nonce.to_slice.each { |b| writer.write_byte b }
+      @config.nonce.to_slice.each { |b| writer.write_byte b }
 
-      ciphertext, _ = config.box.encrypt payload, additional: header.to_slice, nonce: config.nonce
+      ciphertext, _ = @config.box.encrypt payload, additional: header.to_slice, nonce: @config.nonce
       ciphertext.each { |b| token.write_byte b }
 
       Base62.encode token.to_slice
@@ -76,13 +76,13 @@ module Branca
       end
 
       begin
-        payload = config.box.decrypt encrypted, nonce: nonce, additional: header
+        payload = @config.box.decrypt encrypted, nonce: nonce, additional: header
       rescue Sodium::Error::DecryptionFailed
         raise Branca::Error::InvaildToken.new
       end
 
       unless @config.ttl.nil?
-        exp_time = @timestamp + @config.ttl.not_nil!
+        exp_time = timestamp + @config.ttl.not_nil!
         now = Time.utc.to_unix
         if exp_time < now
           raise Branca::Error::TokenHasExpired.new
