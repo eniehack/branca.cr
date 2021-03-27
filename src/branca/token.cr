@@ -16,8 +16,20 @@ module Branca
       @ttl = nil
     end
 
+    # encodes payloads from config
+    #
+    # TODO: allow to accepts JSON::Seriarizable as payload
+    # TODO: allow to accepts String as payload
+    #
+    # examples:
+    # ```
+    # require "branca"
+    #
+    # config = Branca::Configuraion.new
+    # branca = Branca::Token.new
+    # token = branca.encode("hello world".to_slice, config)
+    # ```
     def encode(payload : Bytes, config : BaseConfiguration) : String
-      # TODO: payloadにJSONも受け付けられるようにする
       if @timestamp.nil?
         @timestamp = Time.utc.to_unix.to_u64
       end
@@ -38,6 +50,17 @@ module Branca
       Base62.encode token.to_slice
     end
 
+    # Verified from branca token and config.
+    # When you decodes token, You must use same nonce and same key as used to encode.
+    #
+    # examples:
+    # ```
+    # require "branca"
+    #
+    # config = Branca::Configuraion.new
+    # branca = Branca::Token.new
+    # token = branca.decode("870S4BYxgHw0KnP3W9fgVUHEhT5g86vJ17etaC5Kh5uIraWHCI1psNQGv298ZmjPwoYbjDQ9chy2z", config)
+    # ```
     def decode(token : String, config : BaseConfiguration) : Bytes
       begin
         byte_token = bigint_to_bytes Base62.decode(token)
