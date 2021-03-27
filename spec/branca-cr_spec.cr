@@ -4,7 +4,7 @@ macro encoding_test(no, payload)
   it "vector_test.json - encoding test No.{{no}}" do
     data = json["testGroups"][0]["tests"][{{no}}]
 
-    config = TestConfiguration.new key: data["key"].as_s.to_slice, nil
+    config = TestConfiguration.new key: data["key"].as_s.to_slice, ttl: nil
     config.nonce = data["nonce"].as_s.hexbytes
 
     branca = Branca::Token.new config
@@ -20,7 +20,7 @@ macro decoding_success_test(no, body)
   it "vector_test.json - decoding test No.{{no}}" do
     data = json["testGroups"][1]["tests"][{{no - 8}}]
 
-    config = Branca::Configuration.new key: data["key"].as_s.to_slice, nil
+    config = Branca::Configuration.new key: data["key"].as_s.to_slice, ttl: nil
     branca = Branca::Token.new config
     branca.decode(data["token"].as_s).should eq({{body}})
     branca.timestamp.should eq data["timestamp"].as_i64.to_u64
@@ -32,7 +32,7 @@ macro decoding_failure_test(no, exception)
     data = json["testGroups"][1]["tests"][{{no - 8}}]
 
     expect_raises({{exception}}) do
-      config = Branca::Configuration.new key: data["key"].as_s.to_slice, nil
+      config = Branca::Configuration.new key: data["key"].as_s.to_slice, ttl: nil
       branca = Branca::Token.new config
       branca.decode data["token"].as_s
     end
