@@ -12,7 +12,7 @@ module Branca
     getter box : Sodium::Cipher::Aead::XChaCha20Poly1305Ietf
 
     # Creates a nonce, and generates secret key from argument.
-    # Also, ttl means to time to live for token.
+    # Also, ttl represents seconds to out date for token from created time.
     def initialize(key : Bytes)
       unless key.bytesize == 32
         raise Branca::Error::InvaildKeySize.new
@@ -23,8 +23,8 @@ module Branca
       @nonce = Sodium::Nonce.random
     end
 
-    # Creates a secret key, and nonca.
-    # Also, ttl means to time to live for token.
+    # Creates a secret key, and nonce.
+    # Also, ttl represents seconds to out date for token from created time.
     def initialize
       @key = Sodium::SecureBuffer.random(32)
       @box = Sodium::Cipher::Aead::XChaCha20Poly1305Ietf.new @key
