@@ -8,13 +8,9 @@ module Branca
   BRANCA_VERSION = 0xBA.to_u8
 
   class Token
-    property timestamp : UInt64
-    property ttl : UInt64?
+    @config : BaseConfiguration
 
-    def initialize
-      @timestamp = 0
-      @ttl = nil
-    end
+    def initialize(@config : BaseConfiguration); end
 
     # encodes payloads from config
     #
@@ -26,15 +22,15 @@ module Branca
     # require "branca"
     #
     # config = Branca::Configuraion.new
-    # branca = Branca::Token.new
-    # token = branca.encode("hello world".to_slice, config)
+    # branca = Branca::Token.new(config)
+    # token = branca.encode("hello world".to_slice)
     # ```
-    def encode(payload : Bytes, config : BaseConfiguration) : String
-      if @timestamp.nil?
-        @timestamp = Time.utc.to_unix.to_u64
+    def encode(payload : Bytes, timestamp : UInt64?) : String
+      if timestamp.nil?
+        timestamp = Time.utc.to_unix.to_u64
       end
       byte_timestamp = uninitialized UInt8[4]
-      IO::ByteFormat::BigEndian.encode @timestamp.to_u32, byte_timestamp.to_slice
+      IO::ByteFormat::BigEndian.encode timestamp.to_u32, byte_timestamp.to_slice
 
       header = IO::Memory.new
       token = IO::Memory.new
@@ -42,9 +38,9 @@ module Branca
 
       writer.write_byte BRANCA_VERSION
       byte_timestamp.to_slice.each { |b| writer.write_byte b }
-      config.nonce.to_slice.each { |b| writer.write_byte b }
+      @config.nonce.to_slice.each { |b| writer.write_byte b }
 
-      ciphertext, _ = config.box.encrypt payload, additional: header.to_slice, nonce: config.nonce
+      ciphertext, _ = @config.box.encrypt payload, additional: header.to_slice, nonce: @config.nonce
       ciphertext.each { |b| token.write_byte b }
 
       Base62.encode token.to_slice
@@ -58,10 +54,10 @@ module Branca
     # require "branca"
     #
     # config = Branca::Configuraion.new
-    # branca = Branca::Token.new
-    # token = branca.decode("870S4BYxgHw0KnP3W9fgVUHEhT5g86vJ17etaC5Kh5uIraWHCI1psNQGv298ZmjPwoYbjDQ9chy2z", config)
+    # branca = Branca::Token.new(config)
+    # token = branca.decode("870S4BYxgHw0KnP3W9fgVUHEhT5g86vJ17etaC5Kh5uIraWHCI1psNQGv298ZmjPwoYbjDQ9chy2z")
     # ```
-    def decode(token : String, config : BaseConfiguration) : Bytes
+    def decode(token : String) : Bytes
       begin
         byte_token = bigint_to_bytes Base62.decode(token)
       rescue
@@ -72,8 +68,7 @@ module Branca
       encrypted = byte_token[29..]
 
       version = header[0]
-      timestamp = header[1...5]
-      @timestamp = IO::ByteFormat::BigEndian.decode(UInt32, timestamp).to_u64
+      timestamp = IO::ByteFormat::BigEndian.decode(UInt32, header[1...5]).to_u64
       nonce = Sodium::Nonce.new header[5..28]
 
       if version != BRANCA_VERSION
@@ -81,13 +76,13 @@ module Branca
       end
 
       begin
-        payload = config.box.decrypt encrypted, nonce: nonce, additional: header
+        payload = @config.box.decrypt encrypted, nonce: nonce, additional: header
       rescue Sodium::Error::DecryptionFailed
         raise Branca::Error::InvaildToken.new
       end
 
-      unless @ttl.nil?
-        exp_time = @timestamp + @ttl.not_nil!
+      unless @config.ttl.nil?
+        exp_time = timestamp + @config.ttl.not_nil!
         now = Time.utc.to_unix
         if exp_time < now
           raise Branca::Error::TokenHasExpired.new

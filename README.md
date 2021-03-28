@@ -25,8 +25,8 @@
 require "branca"
 
 config = Branca::Configuration.new ttl: 3600
-branca = Branca::Token.new
-token = branca.encode "Hello world!".to_slice, config
+branca = Branca::Token.new(config)
+token = branca.encode "Hello world!".to_slice
 ```
 
 ### decode tokens
@@ -35,8 +35,8 @@ token = branca.encode "Hello world!".to_slice, config
 require "branca"
 
 config = Branca::Configuration.new ttl: 3600
-branca = Branca::Token.new
-token = branca.decode "870S4BYxgHw0KnP3W9fgVUHEhT5g86vJ17etaC5Kh5uIraWHCI1psNQGv298ZmjPwoYbjDQ9chy2z", config
+branca = Branca::Token.new(config)
+token = branca.decode("870S4BYxgHw0KnP3W9fgVUHEhT5g86vJ17etaC5Kh5uIraWHCI1psNQGv298ZmjPwoYbjDQ9chy2z")
 ```
 
 ## Development
