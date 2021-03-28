@@ -24,7 +24,7 @@
 ```crystal
 require "branca"
 
-config = Branca::Configuration.new
+config = Branca::Configuration.new ttl: 3600
 branca = Branca::Token.new(config)
 token = branca.encode "Hello world!".to_slice
 ```
@@ -34,7 +34,7 @@ token = branca.encode "Hello world!".to_slice
 ```crystal
 require "branca"
 
-config = Branca::Configuration.new
+config = Branca::Configuration.new ttl: 3600
 branca = Branca::Token.new(config)
 token = branca.decode("870S4BYxgHw0KnP3W9fgVUHEhT5g86vJ17etaC5Kh5uIraWHCI1psNQGv298ZmjPwoYbjDQ9chy2z")
 ```
